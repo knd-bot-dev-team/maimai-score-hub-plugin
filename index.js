@@ -61,6 +61,19 @@ class Config {
   }
 }
 
+async function getSyncBinding() {
+  try {
+    const module = await import('../maibot-plugin/model/db.js')
+    const { MaibotDB } = module
+    return {
+      getUserBinding: MaibotDB.getUserBinding,
+      setUserBinding: MaibotDB.setUserBinding
+    }
+  } catch {
+    return null
+  }
+}
+
 class TokenStore {
   static _data = null
 
@@ -1035,6 +1048,14 @@ export class MaimaiScoreHub extends plugin {
       `• #knd sync — 先同步成绩\n` +
       `• #knd 更新${platformName} — 导出到${platformName}`
     , true)
+
+    
+    const SyncBinding = await this.getSyncBinding()
+    if (SyncBinding) {
+      SyncBinding.syncBinding(e.user_id.toString(), platform === 'df' ? 'fish' : 'lxns', tokenInput, 'maimaiScoreHub').catch(err => {
+        logger.warn('[maimai-score-hub] 同步到 maibot 失败:', err)
+      })
+    }
 
     try {
       if (e.group?.recallMsg) {
