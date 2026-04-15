@@ -256,7 +256,7 @@ export class MaimaiScoreHub extends plugin {
 
   requireAuth(e) {
     const userData = TokenStore.get(e.user_id)
-    if (!userData) {
+    if (!userData) { //无userData:
       e.reply(
         `⚠️ 您还未绑定好友代码\n\n` +
         `📌 快速开始:\n` +
@@ -347,8 +347,8 @@ export class MaimaiScoreHub extends plugin {
     }
 
     msg += `\n📌 常用命令:\n`
-    msg += `  #knd sync    同步成绩\n`
-    msg += `  导/ccb  导出到已绑定平台\n`
+    msg += `  #knd sync    只同步成绩\n`
+    msg += `  导/ccb  同步成绩，并导出到已绑定平台\n`
     msg += `  #knd 状态    查看任务进度\n`
     msg += `  #knd help    完整命令列表`
 
@@ -409,14 +409,16 @@ export class MaimaiScoreHub extends plugin {
             `   （不知道落雪查分器是什么？怎么找到api key？怎么正确设置落雪？请发送落雪帮助获取提示）`
         } else {
           msg += `📌 下一步:\n` +
-            `1️⃣ #knd sync — 同步你的游戏成绩\n` +
-            `2️⃣ 导/ccb — 导出到已绑定平台`
+            ` 1️⃣#knd sync — 同步你的游戏成绩\n` +
+            ` 2️⃣#knd 更新水鱼/落雪 —只更新成绩到水鱼/落雪，或：\n` +
+            ` 导/ccb — 同步游戏成绩，并导出到所有已绑定平台（推荐）`
         }
       } else {
         msg += `📌 下一步:\n` +
           `1️⃣ #knd sync — 同步你的游戏成绩\n` +
-          `2️⃣ #knd 绑定水鱼 <Token> — 设置导出平台\n` +
-          `3️⃣ 导/ccb — 导出到已绑定平台`
+          `2️⃣ #knd 绑定水鱼 <Token>或#knd 绑定落雪 <api key> — 设置导出平台\n` +
+          `3️⃣ #knd 更新水鱼/落雪 — 只导出到水鱼/落雪，或：\n` +
+          `导/ccb — 同步游戏成绩，并导出到已绑定平台（推荐）`
       }
       
       await this.recallAndReply(e, msg1?.message_id, msg)
@@ -486,13 +488,13 @@ export class MaimaiScoreHub extends plugin {
           } else {
             msg += `\n📌 下一步:\n` +
               `1️⃣ #knd sync — 同步你的游戏成绩\n` +
-              `2️⃣ 导/ccb — 导出到已绑定平台`
+              `2️⃣ 导/ccb — 同步游戏成绩，导出到已绑定平台`
           }
         } else {
           msg += `\n📌 下一步:\n` +
             `1️⃣ #knd sync — 同步你的游戏成绩\n` +
             `2️⃣ #knd 绑定水鱼 <Token> — 设置导出平台\n` +
-            `3️⃣ 导/ccb — 导出到已绑定平台`
+            `3️⃣ 导/ccb — 同步游戏成绩，导出到已绑定平台`
         }
 
         await e.reply(msg)
@@ -633,9 +635,9 @@ export class MaimaiScoreHub extends plugin {
         }
 
         msg += '\n\n📌 接下来你可以:\n'
-        msg += '  导/ccb — 导出到已绑定平台\n'
-        msg += '  #knd 更新水鱼 — 导出到水鱼查分器\n'
-        msg += '  #knd 更新落雪 — 导出到落雪查分器'
+        msg += '  导/ccb — 同步游戏成绩，并导出到所有已绑定平台，或：\n'
+        msg += '  #knd 更新水鱼 — 只导出到水鱼查分器\n'
+        msg += '  #knd 更新落雪 — 只导出到落雪查分器'
 
         await e.reply(msg, true)
       } else if (jobData.status === 'failed' || jobData.status === 'canceled') {
@@ -1046,7 +1048,8 @@ export class MaimaiScoreHub extends plugin {
       `✅ 绑定${platformName}成功！\n\n` +
       `📌 接下来:\n` +
       `• #knd sync — 先同步成绩\n` +
-      `• #knd 更新${platformName} — 导出到${platformName}`
+      `• #knd 更新${platformName} — 只导出到${platformName}`
+      `• 导/ccb — 同步游戏数据，并导出到所有已绑定的查分器（推荐）`
     , true)
 
     
@@ -1119,10 +1122,10 @@ export class MaimaiScoreHub extends plugin {
     }
 
     await e.reply(
-      `✅ 通过水鱼账号绑定成功！\n\n` +
+      `✅ 水鱼Token绑定成功！\n\n` +
       `📌 接下来:\n` +
-      `• #knd sync — 先同步成绩\n` +
-      `• #knd 更新水鱼 — 导出到水鱼`
+      `• 导/ccb：同步游戏数据，并导入到绑定过的所有查分器（推荐）`
+      `• #knd 更新水鱼：只导入到水鱼查分器`
     , true)
 
     try {
@@ -1246,6 +1249,8 @@ export class MaimaiScoreHub extends plugin {
     await e.reply(`✅ 后端地址已设置为: ${url}`)
   }
 
+   //以下为输出的帮助
+
   async help(e) {
     const msgs = [
       `基于好友vs的舞萌更新成绩插件使用帮助`,
@@ -1298,6 +1303,7 @@ export class MaimaiScoreHub extends plugin {
 
     await e.reply(await Bot.makeForwardMsg(forwardMsg))
   }
+
 
   async divingFishHelp(e) {
     const msgs = [
