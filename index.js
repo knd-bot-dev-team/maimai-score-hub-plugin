@@ -1,4 +1,4 @@
-mport plugin from '../../lib/plugins/plugin.js'
+import plugin from '../../lib/plugins/plugin.js'
 import fs from 'fs'
 import path from 'path'
 import YAML from 'yaml'
